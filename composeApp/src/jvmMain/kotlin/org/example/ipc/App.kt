@@ -86,6 +86,10 @@ fun App() {
         val c_Scope= rememberCoroutineScope()
         var curr_scn by remember { mutableStateOf<String?>(null) }
 
+        val bg_grad_brush =Brush.verticalGradient(
+            colors= listOf(Color(0xFF0F172A), Color(0xFF020617))
+        )
+
 
 
 
@@ -132,6 +136,10 @@ fun App() {
                             c_Scope.launch { ProcessSimulator.runRaceConditionScenario() }
                         }
 
+                        ScenarioButton("Message Queue", Color(0xFF3B82F6), curr_scn== "Message Queue") {
+                            curr_scn ="Message Queue"
+                            c_Scope.launch { ProcessSimulator.runMessageQueueScenario() }
+                        }
 
                         ScenarioButton("Pipe Bottleneck", Color(0xFFF59E0B), curr_scn =="Pipe Bottleneck") {
                             curr_scn= "Pipe Bottleneck"
@@ -139,6 +147,10 @@ fun App() {
                             c_Scope.launch { ProcessSimulator.runPipeBottleneckScenario() }
                         }
 
+                        ScenarioButton("Safe Execution", Color(0xFF10B981), curr_scn =="Safe Execution") {
+                            curr_scn= "Safe Execution"
+                            c_Scope.launch { ProcessSimulator.runSafeExecutionScenario() }
+                        }
                         ScenarioButton("Deadlock", Color(0xFF8B5CF6), curr_scn== "Deadlock") {
                             curr_scn= "Deadlock"
                             c_Scope.launch { ProcessSimulator.runDeadlockScenario() }

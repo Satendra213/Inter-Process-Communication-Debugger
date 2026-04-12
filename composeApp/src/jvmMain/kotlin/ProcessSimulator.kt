@@ -1,6 +1,7 @@
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.example.ipc.SharedMemorySimulation
 import kotlin.random.Random
 
 object ProcessSimulator {
