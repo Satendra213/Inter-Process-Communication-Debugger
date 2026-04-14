@@ -68,30 +68,31 @@ object ProcessSimulator {
         MessageQueue.reset()
 
         Debugger.setExplanation(
-            title ="Message Queue",
-            reason ="Processes are communicating using an asynchronous OS message queue (simulated via Kotlin Channel). Messages are preserved as discrete packets.",
-            solution= "Working as intended. No collisions or blocking detected due to unlimited queue capacity."
+            title = "Message Queue",
+            reason = "Processes are communicating using an asynchronous OS message queue (simulated via Kotlin Channel). Messages are preserved as discrete packets.",
+            solution = "Working as intended. No collisions or blocking detected due to unlimited queue capacity."
         )
         Debugger.log("🚀 STARTING: Message Queue Scenario")
 
         launch {
-            SystemState.p1Status.value= "Sending Messages"
+            SystemState.p1Status.value = "Sending Messages"
 
-            SystemState.isP1Sending.value= true
-            MessageQueue.send("Process-A","Task 1: Process Image")
+            SystemState.isP1Sending.value = true
+            MessageQueue.send("Process-A", "Task 1: Process Image")
             SystemState.messageQueueSize.value++
 
-            SystemState.isP1Sending.value= false
+            SystemState.isP1Sending.value = false
 
             delay(Random.nextLong(80, 120))
 
 
-            SystemState.isP1Sending.value =true
-            MessageQueue.send("Process-A","Task 2: Save to DB")
+            SystemState.isP1Sending.value = true
+            MessageQueue.send("Process-A", "Task 2: Save to DB")
             SystemState.messageQueueSize.value++
-            SystemState.isP1Sending.value=false
-
-            SystemState.p1Status.value="Finished"
+            SystemState.isP1Sending.value = false
+            SystemState.p1Status.value = "Finished"
         }
+
+    }
 }
 
