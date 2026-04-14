@@ -7,15 +7,7 @@ import kotlin.random.Random
 object ProcessSimulator {
 
     suspend fun runRaceConditionScenario() = coroutineScope {
-        SystemState.reset()
-        Debugger.clear()
-        SharedMemorySimulation.reset()
 
-        Debugger.setExplanation(
-            title = "Race Condition",
-            reason = "Two independent processes are reading and writing to the exact same memory variable simultaneously without any synchronization. The final output is corrupted based on unpredictable CPU scheduling.",
-            solution = "Implement a Mutex (Mutual Exclusion lock) to create a 'Critical Section', ensuring only one process can modify the data at a time."
-        )
         Debugger.log("🚀 STARTING: Race Condition Scenario")
 
         launch {
@@ -24,13 +16,7 @@ object ProcessSimulator {
             SystemState.p1Status.value = "Finished"
         }
 
-        launch {
-            delay(Random.nextLong(5, 20))
-            SystemState.p2Status.value = "Running"
-            SharedMemorySimulation.unsafeWrite("Process-2")
 
-            SystemState.p2Status.value = "Finished"
-        }
     }
     suspend fun runSafeExecutionScenario() = coroutineScope {
         SystemState.reset()
@@ -45,11 +31,15 @@ object ProcessSimulator {
         Debugger.log("🚀 STARTING: Safe Execution (Mutex) Scenario")
 
 
+
+
         launch {
             SystemState.p1Status.value="Running"
             SharedMemorySimulation.safeWrite("Process-1")
             SystemState.p1Status.value= "Finished"
         }
+
+
 
         launch {
             delay(Random.nextLong(5, 20))
@@ -59,5 +49,36 @@ object ProcessSimulator {
             SystemState.p2Status.value= "Finished"
         }
     }
+    suspend fun runMessageQueueScenario() = coroutineScope {
+        SystemState.reset()
+        Debugger.clear()
+        MessageQueue.reset()
+
+        Debugger.setExplanation(
+            title ="Message Queue",
+            reason ="Processes are communicating using an asynchronous OS message queue (simulated via Kotlin Channel). Messages are preserved as discrete packets.",
+            solution= "Working as intended. No collisions or blocking detected due to unlimited queue capacity."
+        )
+        Debugger.log("🚀 STARTING: Message Queue Scenario")
+
+        launch {
+            SystemState.p1Status.value= "Sending Messages"
+
+            SystemState.isP1Sending.value= true
+            MessageQueue.send("Process-A","Task 1: Process Image")
+            SystemState.messageQueueSize.value++
+
+            SystemState.isP1Sending.value= false
+
+            delay(Random.nextLong(80, 120))
+
+
+            SystemState.isP1Sending.value =true
+            MessageQueue.send("Process-A","Task 2: Save to DB")
+            SystemState.messageQueueSize.value++
+            SystemState.isP1Sending.value=false
+
+            SystemState.p1Status.value="Finished"
+        }
 }
 
