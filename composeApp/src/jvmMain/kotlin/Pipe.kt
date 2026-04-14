@@ -1,6 +1,3 @@
-package org.example.ipc
-
-
 object PipeSimulation {
     private const val capacity= 3
     private val buffer=mutableListOf<String>()

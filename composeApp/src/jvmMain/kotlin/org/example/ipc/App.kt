@@ -8,13 +8,8 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -146,28 +141,6 @@ fun App() {
                             c_Scope.launch { ProcessSimulator.runMessageQueueScenario() }
                         }
 
-
-
-                        @Composable
-                        fun MonitorItem(label: String, value: String, valueColor: Color) {
-
-                            Column {
-                                androidx.compose.material.Text(
-                                    text = label,
-                                    color = Color(0xFF64748B),
-                                    fontSize = 11.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
-                                androidx.compose.material.Text(
-                                    text = value,
-                                    color = valueColor,
-                                    fontSize = 13.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    fontFamily = FontFamily.Monospace
-                                )
-                            }
-                        }
-
                         ScenarioButton("Pipe Bottleneck", Color(0xFFF59E0B), curr_scn =="Pipe Bottleneck") {
                             curr_scn= "Pipe Bottleneck"
 
@@ -178,8 +151,6 @@ fun App() {
                             curr_scn= "Safe Execution"
                             c_Scope.launch { ProcessSimulator.runSafeExecutionScenario() }
                         }
-
-
                         ScenarioButton("Deadlock", Color(0xFF8B5CF6), curr_scn== "Deadlock") {
                             curr_scn= "Deadlock"
                             c_Scope.launch { ProcessSimulator.runDeadlockScenario() }
@@ -203,22 +174,18 @@ fun App() {
                                     backgroundColor= Color(0xFF0F172A).copy(alpha = 0.8f)
                                 ) {
                                     Column(modifier =Modifier.padding(16.dp)) {
-                                        androidx.compose.material.Text(
-                                            text = "⚡ SYSTEM STATE",
-                                            color = Color(0xFF38BDF8),
-                                            fontSize = 12.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            letterSpacing = 1.sp,
+                                        Text(
+                                            text ="⚡ SYSTEM STATE",
+                                            color= Color(0xFF38BDF8),
+                                            fontSize= 12.sp,
+                                            fontWeight= FontWeight.Bold,
+                                            letterSpacing= 1.sp,
 
-                                            modifier = Modifier.padding(bottom = 12.dp)
+                                            modifier= Modifier.padding(bottom = 12.dp)
                                         )
                                         Row(modifier =Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                                             Column(modifier= Modifier.weight(1f)) {
-                                                org.ipcsimulator.project.MonitorItem(
-                                                    "P1 Status",
-                                                    SystemState.p1Status.value,
-                                                    getStatusColor(SystemState.p1Status.value)
-                                                )
+                                                MonitorItem("P1 Status", SystemState.p1Status.value, getStatusColor(SystemState.p1Status.value))
                                                 Spacer(modifier= Modifier.height(8.dp))
                                                 MonitorItem("P2 Status", SystemState.p2Status.value, getStatusColor(SystemState.p2Status.value))
 
@@ -266,6 +233,13 @@ fun App() {
 
 fun getStatusColor(status: String): Color {
     return when {
+        status== "Idle" ->Color(0xFF64748B)
+
+
+
+
+        status =="Finished" || status.contains("Sending") || status.contains("Processing")-> Color(0xFF10B981)
+        status.contains("Waiting") || status.contains("Blocked") || status.contains("Holding") ->Color(0xFFF59E0B)
         status== "DEADLOCKED"-> Color(0xFFEF4444)
         else-> Color(0xFF38BDF8)
     }
