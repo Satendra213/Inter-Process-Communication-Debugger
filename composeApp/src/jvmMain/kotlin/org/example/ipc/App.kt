@@ -31,11 +31,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
+import androidx.compose.material.Divider
 import androidx.compose.material.darkColors
 import androidx.compose.material3.Button
 import androidx.compose.material.MaterialTheme
@@ -362,6 +364,80 @@ fun App() {
                                             lineHeight= 18.sp
                                         )
                                     }
+                                }
+                            }
+                        }
+                        Card(
+                            modifier =Modifier.weight(0.35f).fillMaxHeight().shadow(8.dp, RoundedCornerShape(12.dp)).border(1.dp, Color(0xFF334155), RoundedCornerShape(12.dp)),
+                            shape= RoundedCornerShape(12.dp),
+
+                            backgroundColor =Color(0xFF1E293B).copy(alpha = 0.7f),
+                            elevation =0.dp
+                        )
+                        {
+                            Column(modifier =Modifier.padding(16.dp).fillMaxSize()) {
+                                Row(verticalAlignment =Alignment.CenterVertically, modifier = Modifier.padding(bottom = 12.dp)) {
+                                    androidx.compose.material.Text(
+                                        "🧠",
+                                        fontSize = 18.sp,
+                                        modifier = Modifier.padding(end = 8.dp)
+                                    )
+                                    androidx.compose.material.Text(
+                                        text = "Explanation Panel",
+                                        color = Color.White,
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+
+                                }
+                                Divider(color =Color(0xFF334155), modifier = Modifier.padding(bottom = 12.dp))
+
+                                if (Debugger.currentInfo.value.title.isEmpty()) {
+                                    Box(modifier =Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                        androidx.compose.material.Text(
+                                            "Run a scenario to view details.",
+                                            color = Color(0xFF94A3B8),
+                                            fontSize = 13.sp
+                                        )
+                                    }
+                                } else {
+                                    androidx.compose.material.Text(
+                                        text = Debugger.currentInfo.value.title,
+                                        color = Color(0xFF38BDF8),
+                                        fontSize = 15.sp,
+                                        fontWeight = FontWeight.Bold,
+
+                                        modifier = Modifier.padding(bottom = 10.dp)
+                                    )
+
+                                    androidx.compose.material.Text(
+                                        "REASON:",
+                                        color = Color(0xFF94A3B8),
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    androidx.compose.material.Text(
+                                        text = Debugger.currentInfo.value.reason,
+                                        color = Color.White,
+                                        fontSize = 13.sp,
+                                        lineHeight = 18.sp,
+                                        modifier = Modifier.padding(top = 4.dp, bottom = 12.dp)
+                                    )
+
+                                    androidx.compose.material.Text(
+                                        "SOLUTION:",
+                                        color = Color(0xFF94A3B8),
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+
+                                    androidx.compose.material.Text(
+                                        text = Debugger.currentInfo.value.solution,
+                                        color = Color(0xFF10B981),
+                                        fontSize = 13.sp,
+                                        lineHeight = 18.sp,
+                                        modifier = Modifier.padding(top = 4.dp)
+                                    )
                                 }
                             }
                         }

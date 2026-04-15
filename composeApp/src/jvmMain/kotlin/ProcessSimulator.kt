@@ -2,6 +2,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlin.random.Random
 
 object ProcessSimulator {
@@ -131,6 +132,50 @@ object ProcessSimulator {
 
         val resourceA = Mutex()
         val resourceB = Mutex()
+
+
+        launch {
+            SystemState.p1Status.value ="Running"
+            Debugger.log("Process-1 attempting to lock Resource A...")
+
+            SystemState.p1ResourceA_Status.value="Requesting"
+            resourceA.withLock {
+                SystemState.p1ResourceA_Status.value="Acquired"
+                Debugger.log("🔒 Process-1 locked Resource A. Waiting for B...")
+
+                SystemState.p1Status.value="Holding A, Waiting for B"
+                delay(Random.nextLong(80, 120))
+                Debugger.log("Process-1 attempting to lock Resource B...")
+                SystemState.p1ResourceB_Status.value ="Requesting"
+
+                resourceB.withLock {
+                    SystemState.p1ResourceB_Status.value="Acquired"
+                    Debugger.log("Process-1 locked both resources!")
+                }
+            }
+        }
+
+        launch {
+            delay(Random.nextLong(5,15))
+            SystemState.p2Status.value ="Running"
+            Debugger.log("Process-2 attempting to lock Resource B...")
+
+            SystemState.p2ResourceB_Status.value= "Requesting"
+            resourceB.withLock {
+                SystemState.p2ResourceB_Status.value= "Acquired"
+                Debugger.log("🔒 Process-2 locked Resource B. Waiting for A...")
+                SystemState.p2Status.value= "Holding B, Waiting for A"
+
+                delay(Random.nextLong(80, 120))
+                Debugger.log("Process-2 attempting to lock Resource A...")
+                SystemState.p2ResourceA_Status.value="Requesting"
+                resourceA.withLock {
+
+                    SystemState.p2ResourceA_Status.value ="Acquired"
+                    Debugger.log("Process-2 locked both resources!")
+                }
+            }
+        }
 
 
     }
