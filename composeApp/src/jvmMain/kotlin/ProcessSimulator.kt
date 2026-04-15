@@ -1,6 +1,7 @@
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
 import kotlin.random.Random
 
 object ProcessSimulator {
@@ -92,7 +93,48 @@ object ProcessSimulator {
             SystemState.isP1Sending.value = false
             SystemState.p1Status.value = "Finished"
         }
+        launch {
+            SystemState.p2Status.value ="Awaiting Messages"
+            delay(Random.nextLong(40, 60))
+
+
+            SystemState.p2Status.value="Processing Message"
+            SystemState.isP2Receiving.value= true
+            MessageQueue.receive("Process-B")
+            SystemState.messageQueueSize.value = maxOf(0, SystemState.messageQueueSize.value- 1)
+            SystemState.isP2Receiving.value= false
+
+            delay(Random.nextLong(80,120))
+
+
+            SystemState.isP2Receiving.value= true
+            MessageQueue.receive("Process-B")
+            SystemState.messageQueueSize.value= maxOf(0, SystemState.messageQueueSize.value - 1)
+            SystemState.isP2Receiving.value= false
+
+            SystemState.p2Status.value= "Finished"
+        }
+
 
     }
+
+    suspend fun runDeadlockScenario() = coroutineScope {
+        SystemState.reset()
+        Debugger.clear()
+
+        Debugger.setExplanation(
+            title = "Deadlock",
+            reason = "Process-1 holds Resource A and waits for Resource B. Process-2 holds Resource B and waits for Resource A. Both are stuck in an infinite circular wait.",
+            solution = "Implement 'Resource Ordering'. Force all processes to request Resource A before they are allowed to request Resource B to prevent circular dependencies."
+        )
+        Debugger.log("🚀 STARTING: Deadlock Scenario")
+
+        val resourceA = Mutex()
+        val resourceB = Mutex()
+
+
+    }
+
+
 }
 

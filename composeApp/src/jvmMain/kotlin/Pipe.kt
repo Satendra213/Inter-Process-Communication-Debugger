@@ -26,6 +26,23 @@ object PipeSimulation {
         Debugger.log("$pname wrote: $data | Buffer: ${getVisualBuffer()}")
     }
 
+    suspend fun read(pname: String) {
+
+        if (buffer.isNotEmpty()) {
+            val data=buffer.removeAt(0)
+            SystemState.isPipeBottleneck.value =false
+            SystemState.pipeBufferVisual.value= getVisualBuffer()
+            Debugger.log("$pname read: $data | Buffer: ${getVisualBuffer()}")
+        } else {
+            Debugger.log("$pname waiting to read... Pipe is empty. [ □ □ □ ]")
+        }
+    }
+
+
+    suspend fun reset() {
+        buffer.clear()
+    }
+
 
 
 }

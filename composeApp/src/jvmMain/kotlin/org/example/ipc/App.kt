@@ -239,127 +239,6 @@ fun App() {
                             }
                         }
                     }
-                    Card(
-                        modifier= Modifier.weight(0.65f).fillMaxHeight().shadow(8.dp, RoundedCornerShape(12.dp)).border(1.dp, Color(0xFF334155), RoundedCornerShape(12.dp)),
-                        shape= RoundedCornerShape(12.dp),
-                        backgroundColor= Color(0xFF09090B),
-                        elevation= 0.dp
-                    )
-                    {
-
-                        Column(modifier =Modifier.padding(16.dp)) {
-                            Row(
-                                modifier =Modifier.fillMaxWidth().padding(bottom = 12.dp),
-                                horizontalArrangement= Arrangement.SpaceBetween,
-                                verticalAlignment =Alignment.CenterVertically
-                            ) {
-                                Row(verticalAlignment= Alignment.CenterVertically) {
-                                    Row(horizontalArrangement =Arrangement.spacedBy(6.dp), modifier= Modifier.padding(end = 12.dp)) {
-
-                                        Box(modifier= Modifier.size(10.dp).clip(RoundedCornerShape(50)).background(Color(0xFFEF4444)))
-                                        Box(modifier =Modifier.size(10.dp).clip(RoundedCornerShape(50)).background(Color(0xFFF59E0B)))
-                                        Box(modifier =Modifier.size(10.dp).clip(RoundedCornerShape(50)).background(Color(0xFF10B981)))
-                                    }
-                                    androidx.compose.material.Text(
-                                        text = "~/system_logs",
-                                        color = Color(0xFF10B981),
-                                        fontSize = 14.sp,
-                                        fontWeight = FontWeight.SemiBold,
-                                        fontFamily = FontFamily.Monospace,
-                                        modifier = Modifier.padding(end = 12.dp)
-                                    )
-
-                                    AnimatedVisibility(
-                                        visible= curr_scn != null,
-                                        enter =fadeIn() + expandHorizontally(),
-                                        exit =fadeOut() + shrinkHorizontally()
-                                    ) {
-                                        Row(
-                                            verticalAlignment= Alignment.CenterVertically,
-                                            modifier =Modifier.background(Color(0xFF1E293B), RoundedCornerShape(6.dp)).padding(horizontal = 8.dp, vertical = 4.dp)
-                                        ) {
-                                            org.ipcsimulator.project.PulsingDot()
-                                            Spacer(modifier= Modifier.width(6.dp))
-                                            androidx.compose.material.Text(
-                                                text = "RUNNING: ${curr_scn?.uppercase()}",
-                                                color = Color(0xFF38BDF8),
-                                                fontSize = 11.sp,
-
-                                                fontWeight = FontWeight.Bold,
-                                                fontFamily = FontFamily.Monospace,
-                                                letterSpacing = 0.5.sp
-                                            )
-                                        }
-                                    }
-                                }
-
-                                Row(verticalAlignment= Alignment.CenterVertically) {
-
-                                    androidx.compose.material.Text(
-                                        "Demo Mode",
-                                        color = Color(0xFF94A3B8),
-                                        fontSize = 12.sp,
-                                        modifier = Modifier.padding(end = 6.dp)
-                                    )
-                                    Switch(
-                                        checked= Debugger.modeSlow.value,
-                                        onCheckedChange = { Debugger.modeSlow.value= it },
-                                        colors =SwitchDefaults.colors(
-                                            checkedThumbColor= Color(0xFF10B981),
-                                            checkedTrackColor= Color(0xFF10B981).copy(alpha = 0.5f),
-                                            uncheckedThumbColor= Color(0xFF64748B),
-                                            uncheckedTrackColor= Color(0xFF334155)
-                                        ),
-                                        modifier= Modifier.padding(end = 12.dp).scale(0.8f)
-
-                                    )
-                                    androidx.compose.material.Button(
-                                        onClick = {
-                                            c_Scope.launch { Debugger.clear() }
-                                            SystemState.reset()
-                                            curr_scn = null
-
-                                        },
-                                        colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF1E293B)),
-                                        shape = RoundedCornerShape(6.dp),
-                                        elevation = ButtonDefaults.elevation(0.dp, 0.dp),
-                                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
-                                    ) {
-                                        Text(
-                                            "Clear",
-                                            color = Color.White,
-                                            fontSize = 12.sp,
-                                            fontWeight = FontWeight.Medium
-                                        )
-                                    }
-                                }
-                            }
-
-                            Divider(color =Color(0xFF1E293B), modifier = Modifier.padding(bottom = 12.dp))
-
-                            LazyColumn(modifier =Modifier.fillMaxSize()) {
-                                items(Debugger.logs) { log_line->
-                                    val txt_clr_x= when {
-                                        log_line.contains("⚠️")-> Color(0xFFFCA5A5)
-                                        log_line.contains("🚀") ->Color(0xFF6EE7B7)
-
-                                        log_line.contains("🔒") || log_line.contains("🔓")-> Color(0xFF7DD3FC)
-                                        log_line.contains("✉️") || log_line.contains("📥") ->Color(0xFFC4B5FD)
-                                        else-> Color(0xFFE2E8F0)
-                                    }
-                                    Text(
-                                        text =log_line,
-                                        color =txt_clr_x,
-                                        fontFamily= FontFamily.Monospace,
-                                        fontSize= 13.sp,
-
-                                        modifier =Modifier.padding(vertical = 2.dp),
-                                        lineHeight= 18.sp
-                                    )
-                                }
-                            }
-                        }
-                    }
                     Row(
                         modifier =Modifier.fillMaxWidth().weight(1f),
                         horizontalArrangement =Arrangement.spacedBy(12.dp)
@@ -498,10 +377,58 @@ fun getStatusColor(status: String): Color {
     return when {
         status== "Idle" ->Color(0xFF64748B)
 
+
+
+
         status =="Finished" || status.contains("Sending") || status.contains("Processing")-> Color(0xFF10B981)
         status.contains("Waiting") || status.contains("Blocked") || status.contains("Holding") ->Color(0xFFF59E0B)
         status== "DEADLOCKED"-> Color(0xFFEF4444)
         else-> Color(0xFF38BDF8)
+    }
+}
+
+
+
+
+
+
+
+@Composable
+fun ScenarioButton(text: String, color: Color, isActive: Boolean, onClick: () -> Unit) {
+    val iSrc =remember { MutableInteractionSource() }
+    val isPrsd by iSrc.collectIsPressedAsState()
+
+
+    val sclVal by animateFloatAsState(
+        targetValue= if (isPrsd) 0.92f else 1f,
+        animationSpec= tween(durationMillis = 100),
+        label= "buttonScale"
+    )
+
+    androidx.compose.material.Button(
+        onClick = onClick,
+        interactionSource = iSrc,
+        colors = ButtonDefaults.buttonColors(
+            backgroundColor = if (isActive) color else color.copy(alpha = 0.8f)
+
+        ),
+        shape = RoundedCornerShape(8.dp),
+        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 10.dp),
+        elevation = ButtonDefaults.elevation(
+            defaultElevation = if (isActive) 6.dp else 2.dp,
+            pressedElevation = 0.dp,
+            hoveredElevation = 8.dp
+        ),
+        modifier = Modifier.scale(sclVal)
+    ) {
+        Text(
+            text = text,
+            color = Color.White,
+
+            fontWeight = if (isActive) FontWeight.ExtraBold else FontWeight.Bold,
+            fontSize = 13.sp,
+            letterSpacing = 0.5.sp
+        )
     }
 }
 
