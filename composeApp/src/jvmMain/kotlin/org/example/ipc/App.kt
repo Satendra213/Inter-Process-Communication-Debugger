@@ -301,25 +301,13 @@ fun App() {
                                     }
 
                                     Row(verticalAlignment= Alignment.CenterVertically) {
-
                                         androidx.compose.material.Text(
                                             "Demo Mode",
                                             color = Color(0xFF94A3B8),
                                             fontSize = 12.sp,
                                             modifier = Modifier.padding(end = 6.dp)
                                         )
-                                        Switch(
-                                            checked= Debugger.modeSlow.value,
-                                            onCheckedChange = { Debugger.modeSlow.value= it },
-                                            colors =SwitchDefaults.colors(
-                                                checkedThumbColor= Color(0xFF10B981),
-                                                checkedTrackColor= Color(0xFF10B981).copy(alpha = 0.5f),
-                                                uncheckedThumbColor= Color(0xFF64748B),
-                                                uncheckedTrackColor= Color(0xFF334155)
-                                            ),
-                                            modifier= Modifier.padding(end = 12.dp).scale(0.8f)
 
-                                        )
                                         androidx.compose.material.Button(
                                             onClick = {
                                                 c_Scope.launch { Debugger.clear() }
@@ -346,14 +334,7 @@ fun App() {
 
                                 LazyColumn(modifier =Modifier.fillMaxSize()) {
                                     items(Debugger.logs) { log_line->
-                                        val txt_clr_x= when {
-                                            log_line.contains("⚠️")-> Color(0xFFFCA5A5)
-                                            log_line.contains("🚀") ->Color(0xFF6EE7B7)
 
-                                            log_line.contains("🔒") || log_line.contains("🔓")-> Color(0xFF7DD3FC)
-                                            log_line.contains("✉️") || log_line.contains("📥") ->Color(0xFFC4B5FD)
-                                            else-> Color(0xFFE2E8F0)
-                                        }
                                         Text(
                                             text =log_line,
                                             color =txt_clr_x,
@@ -448,6 +429,8 @@ fun App() {
         }
     }
 }
+
+
 
 fun getStatusColor(status: String): Color {
     return when {
