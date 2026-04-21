@@ -64,6 +64,38 @@ object ProcessSimulator {
             SystemState.p2Status.value= "Finished"
         }
     }
+    suspend fun runPipeBottleneckScenario() = coroutineScope {
+        SystemState.reset()
+        Debugger.clear()
+        PipeSimulation.reset()
+        Debugger.setExplanation(
+            title= "Pipe Bottleneck (Buffer Overflow)",
+            reason= "The Producer process is writing data significantly faster than the Consumer process can read it. The limited OS pipe buffer hits maximum capacity.",
+            solution ="The OS automatically blocks the Producer to prevent data loss. Optimization requires increasing consumer speed or increasing buffer size."
+        )
+        Debugger.log("🚀 STARTING: Pipe Bottleneck Scenario")
+
+        launch {
+            SystemState.p1Status.value="Producing (Fast)"
+            for (i in 1..5) {
+                if (SystemState.isPipeBottleneck.value) SystemState.p1Status.value= "Blocked by OS"
+                PipeSimulation. write("Producer","DataChunk-$i")
+                delay(Random.nextLong(30, 70))
+            }
+
+            SystemState.p1Status.value="Finished"
+        }
+
+        launch {
+            SystemState.p2Status.value="Consuming (Slow)"
+            for (i in 1..5) {
+
+                delay(Random.nextLong(250, 350))
+                PipeSimulation.read("Consumer")
+            }
+            SystemState.p2Status.value ="Finished"
+        }
+    }
     suspend fun runMessageQueueScenario() = coroutineScope {
         SystemState.reset()
         Debugger.clear()
@@ -94,6 +126,7 @@ object ProcessSimulator {
             SystemState.isP1Sending.value = false
             SystemState.p1Status.value = "Finished"
         }
+
         launch {
             SystemState.p2Status.value ="Awaiting Messages"
             delay(Random.nextLong(40, 60))
